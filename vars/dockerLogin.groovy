@@ -2,6 +2,6 @@
 
 import com.example.Docker
 
-def call(String imageName) {
+def call() {
     return new Docker(this).dockerLogin()
 }
