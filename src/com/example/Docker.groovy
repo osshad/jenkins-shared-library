@@ -34,6 +34,6 @@ class Docker implements Serializable {
             returnStdout: true
         ).trim()
     
-        return "${version}-${env.BUILD_NUMBER}"
+        return "${version}-${script.env.BUILD_NUMBER}"
     }
 }
