@@ -24,4 +24,16 @@ class Docker implements Serializable {
     def dockerPush(String imageName) {
         script.sh "docker push $imageName"
     }
+
+    def incrementVersion() {
+        echo 'incrementing app version'
+        sh 'mvn build-helper:parse-version versions:set \
+            -DnewVersion=\\\${parsedVersion.majorVersion}.\\\${parsedVersion.minorVersion}.\\\${parsedVersion.nextIncrementalVersion} versions:commit'
+        def version = sh(
+            script: 'mvn help:evaluate -Dexpression=project.version -q -DforceStdout',
+            returnStdout: true
+        ).trim()
+    
+        return "${version}-${env.BUILD_NUMBER}"
+    }
 }
