@@ -39,17 +39,27 @@ class Docker implements Serializable {
 
     def commitVersionUpdate() {
         script.withCredentials([
-            script.usernamePassword(credentialsId: 'gh-push-creds', usernameVariable: 'USER', passwordVariable: 'PASS')
+            script.gitUsernamePassword(
+                credentialsId: 'gh-push-creds',
+                gitToolName: 'Default'
+            )
         ]) {
-            script.sh 'git config user.email "jenkins@example.com"'
-            script.sh 'git config user.name "Jenkins"'
-            script.sh "git status"
-            script.sh "git branch"
-            script.sh "git config --list"
-            script.sh "git remote set-url origin https://${USER}:${PASS}@github.com/osshad/java-maven-app-techwithnana.git"
-            script.sh "git add ."
-            script.sh 'git commit -m "ci: version bump"'
-            script.sh "git push origin HEAD:jenkins-shared-lib"
+            script.sh '''
+                git config user.email "jenkins@example.com"
+                git config user.name "Jenkins"
+    
+                git remote set-url origin \
+                    https://github.com/osshad/java-maven-app-techwithnana.git
+    
+                git add -- pom.xml
+    
+                if git diff --cached --quiet; then
+                    echo "No version change to commit"
+                else
+                    git commit -m "ci: version bump"
+                    git push origin HEAD:jenkins-shared-lib
+                fi
+            '''
         }
     }
 }
